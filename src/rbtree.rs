@@ -791,9 +791,9 @@ impl<'a, A: for<'b> KeyAdapter<'b, Link = Link>> CursorMut<'a, A> {
         // end up with multiple CursorMut in the same collection.
         self.tree.insert(val);
     }
-    
-    pub fn entry<Q: ?Sized + Ord>(&'a mut self, key: &Q) -> Entry<'a, A>
-        where <A as KeyAdapter<'a>>::Key: Borrow<Q>
+
+    pub fn entry<'c, Q: ?Sized + Ord>(&'c mut self, key: &Q) -> Entry<'c, A>
+        where <A as KeyAdapter<'c>>::Key: Borrow<Q>
     {
         self.tree.entry(key)
     }
