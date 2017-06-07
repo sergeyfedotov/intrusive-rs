@@ -793,7 +793,7 @@ impl<'a, A: for<'b> KeyAdapter<'b, Link = Link>> CursorMut<'a, A> {
     }
     
     #[inline]
-    pub fn entry<'a, Q: ?Sized + Ord>(&'a mut self, key: &Q) -> Entry<'a, A>
+    pub fn entry<Q: ?Sized + Ord>(&'a mut self, key: &Q) -> Entry<'a, A>
         where <A as KeyAdapter<'a>>::Key: Borrow<Q>
     {
         self.tree.entry(key)
