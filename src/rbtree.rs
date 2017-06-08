@@ -586,7 +586,6 @@ impl<'a, A: Adapter<Link = Link> + 'a> Cursor<'a, A> {
 }
 
 /// A cursor which provides mutable access to a `RBTree`.
-#[derive(Clone)]
 pub struct CursorMut<'a, A: Adapter<Link = Link> + 'a> {
     current: NodePtr,
     tree: &'a mut RBTree<A>,
