@@ -921,6 +921,52 @@ impl<A: Adapter<Link = Link>> RBTree<A> {
     }
 
     #[inline]
+    fn find_with_internal<F>(&self, comp: F) -> NodePtr
+        where F: Fn(&A::Value) -> Ordering
+    {
+        let mut tree = self.root;
+        while !tree.is_null() {
+            let current = unsafe { &*self.adapter.get_value(tree.0) };
+            match comp(current) {
+                Ordering::Less => tree = unsafe { tree.left() },
+                Ordering::Equal => return tree,
+                Ordering::Greater => tree = unsafe { tree.right() },
+            }
+        }
+        NodePtr::null()
+    }
+
+    /// Returns a `Cursor` pointing to an element with the given key. If no such
+    /// element is found then a null cursor is returned.
+    ///
+    /// If multiple elements with an identical key are found then an arbitrary
+    /// one is returned.
+    #[inline]
+    pub fn find_with<'a, F>(&'a self, comp: F) -> Cursor<'a, A>
+        where F: Fn(&A::Value) -> Ordering
+    {
+        Cursor {
+            current: self.find_with_internal(comp),
+            tree: self,
+        }
+    }
+
+    /// Returns a `CursorMut` pointing to an element with the given key. If no
+    /// such element is found then a null cursor is returned.
+    ///
+    /// If multiple elements with an identical key are found then an arbitrary
+    /// one is returned.
+    #[inline]
+    pub fn find_mut_with<'a, F>(&'a mut self, comp: F) -> CursorMut<'a, A>
+        where F: Fn(&A::Value) -> Ordering
+    {
+        CursorMut {
+            current: self.find_with_internal(comp),
+            tree: self,
+        }
+    }
+
+    #[inline]
     unsafe fn insert_root(&mut self, node: NodePtr) {
         node.set_parent_color(NodePtr::null(), Color::Black);
         node.set_left(NodePtr::null());
